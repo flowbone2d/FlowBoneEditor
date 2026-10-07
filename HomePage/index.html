@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="FlowBone là trình biên tập hoạt hình xương 2D miễn phí, đọc và ghi đúng định dạng Spine 3.8. Ủng hộ tác giả một ly cà phê.">
+<link rel="icon" type="image/png" href="../V1.1.2/favicon.png">
+<meta property="og:title" content="Mời FlowBone một ly cà phê">
+<meta property="og:description" content="Trình biên tập hoạt hình xương 2D miễn phí, round-trip đúng định dạng Spine 3.8 cho spine-unity.">
+<meta property="og:image" content="https://cdn.buymeacoffee.com/opengraph/images/11587744/1/og_14419384_1790691624.jpg">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://buymeacoffee.com">
+<link rel="preconnect" href="https://cdn.buymeacoffee.com">
+<title>Mời FlowBone một ly cà phê</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+/* ---------------------------------------------------------------
+   Dựng theo buymeacoffee.com/sliboxsoft: nền trắng, cover full-bleed,
+   avatar tròn đè lên cover, thẻ bo góc, màu nhấn #5F7FFF (page_color
+   thật của trang) và màu chữ #0D0C22 (ink gốc lấy từ widget BMC).
+
+   CHỈ CÓ THEME SÁNG — có chủ ý. Khung donate là iframe của BMC và
+   luôn là nền trắng; nếu trang nền tối thì khối trắng 420px đó sẽ
+   chọi hẳn ra. Khoá light để trang và widget khớp nhau.
+   --------------------------------------------------------------- */
+:root{
+  --accent:#5F7FFF;
+  --accent-dark:#4a69f0;
+  --bg:#ffffff;
+  --panel:#ffffff;
+  --sunken:#f7f8fa;
+  --fg:#0D0C22;
+  --dim:#6b7280;
+  --line:#e6e8ec;
+  --radius:14px;
+  --font:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  color-scheme:light;
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--fg);
+  font-family:var(--font);font-size:16px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%;display:block}
+p{margin:0}
+a{color:var(--accent)}
+code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.86em;
+  background:var(--sunken);border:1px solid var(--line);
+  border-radius:5px;padding:.1em .38em;
+}
+a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* ---- cover + avatar ---- */
+.cover{
+  height:clamp(140px,24vw,280px);
+  background:var(--sunken) center/cover no-repeat;
+  background-image:url("https://cdn.buymeacoffee.com/uploads/cover_images/2026/09/0Fdfmk0kmNg59cjEdYxl3sGT3Tyt0q09abuKJQ4x.jpg@1400w_0e_90q.webp");
+  border-bottom:1px solid var(--line);
+}
+.shell{max-width:1000px;margin:0 auto;padding-inline:20px}
+
+.profile{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px}
+.avatar{
+  width:clamp(92px,16vw,120px);aspect-ratio:1;border-radius:50%;
+  margin-top:calc(clamp(92px,16vw,120px) / -2);
+  background:var(--sunken) center/cover no-repeat;
+  background-image:url("https://cdn.buymeacoffee.com/uploads/profile_pictures/2026/09/TXo9EZzDvMAmTwph.png@300w_0e.webp");
+  border:4px solid var(--panel);
+  box-shadow:0 2px 10px rgba(13,12,34,.12);
+}
+.profile h1{
+  margin:6px 0 0;font-size:clamp(1.7rem,5vw,2.25rem);
+  font-weight:800;letter-spacing:-.028em;line-height:1.12;
+}
+.profile .handle{color:var(--dim);font-size:.95rem;font-weight:500}
+.profile .tagline{color:var(--fg);font-size:1.05rem;text-wrap:balance;margin-top:4px}
+.profile .meta{color:var(--dim);font-size:.86rem}
+
+/* ---- Follow / Share kiểu BMC ---- */
+.actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:14px}
+
+/* =====  BỐ CỤC CHÍNH  ==========================================
+   Màn hẹp: 1 cột, khung donate lên trước.
+   Màn rộng (>=900px): 2 cột ngang — donate 420px (đúng bề rộng tự
+   nhiên của widget BMC, không bị bóp), description chiếm phần còn lại.
+   ============================================================== */
+.main{
+  display:grid;gap:22px;
+  grid-template-columns:minmax(0,1fr);
+  padding-block:26px 0;
+}
+@media (min-width:900px){
+  .main{grid-template-columns:420px minmax(0,1fr);gap:28px;align-items:start}
+  .support{position:sticky;top:22px}   /* khung donate theo khi đọc description dài */
+}
+
+.col{display:flex;flex-direction:column;gap:22px;min-width:0}
+
+/* ---- thẻ ---- */
+.card{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);padding:clamp(18px,3.2vw,26px);
+}
+.card > h2{
+  margin:0 0 16px;font-size:1.22rem;font-weight:700;
+  letter-spacing:-.018em;line-height:1.25;text-wrap:balance;
+}
+
+/* ---- khung donate: iframe widget thật của BMC ---- */
+.support .card{padding:0;overflow:hidden}
+.support h2{
+  margin:0;padding:18px clamp(18px,3.2vw,22px) 14px;
+  font-size:1.18rem;font-weight:700;letter-spacing:-.018em;
+}
+.frame{position:relative;background:#fff;border-top:1px solid var(--line)}
+.frame iframe{
+  display:block;width:100%;border:0;
+  height:clamp(560px,74vh,720px);
+}
+.frame-note{
+  padding:14px clamp(18px,3.2vw,22px) 18px;
+  border-top:1px solid var(--line);background:var(--sunken);
+}
+.fineprint{font-size:.82rem;color:var(--dim);text-wrap:pretty}
+.frame-note .btn-ghost{margin-bottom:10px;width:100%}
+
+/* ---- nút ---- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  font-family:inherit;font-weight:700;font-size:1rem;
+  text-decoration:none;cursor:pointer;
+  padding:13px 24px;border-radius:999px;border:1px solid transparent;
+  background:var(--accent);color:#fff;transition:background .12s;
+}
+.btn:hover{background:var(--accent-dark)}
+.btn svg{flex:none}
+.btn-ghost{
+  background:var(--panel);color:var(--fg);border-color:var(--line);
+  font-size:.92rem;font-weight:600;padding:11px 18px;
+}
+.btn-ghost:hover{background:var(--sunken);border-color:var(--accent);color:var(--accent)}
+
+/* ---- description / lời tác giả ---- */
+.about .body{display:flex;flex-direction:column;gap:11px;font-size:.98rem}
+.about strong{font-weight:700}
+.about .label{
+  display:block;margin:0 0 6px;font-size:.72rem;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--dim);
+}
+
+/* ---- FlowBone ---- */
+.facts dl{margin:0;display:flex;flex-direction:column;gap:14px}
+.facts div{display:flex;gap:14px;align-items:baseline}
+.facts dt{
+  flex:none;width:76px;font-size:.72rem;font-weight:700;
+  letter-spacing:.07em;text-transform:uppercase;color:var(--dim);
+}
+.facts dd{margin:0;font-size:.95rem;min-width:0}
+@media (max-width:520px){
+  .facts div{flex-direction:column;gap:3px}
+  .facts dt{width:auto}
+}
+.cta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+
+footer{
+  border-top:1px solid var(--line);margin-top:34px;
+  padding-block:22px 40px;color:var(--dim);font-size:.85rem;
+}
+footer .links{
+  display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:center;
+  margin-bottom:12px;font-weight:600;font-size:.88rem;
+}
+footer .links a{text-decoration:none}
+footer .links a:hover{text-decoration:underline}
+footer p{text-align:center;text-wrap:balance;max-width:56ch;margin-inline:auto}
+
+/* chừa chỗ cho nút nổi BMC ở góc phải dưới, khỏi che link footer */
+@media (max-width:600px){footer{padding-bottom:104px}}
+</style>
+</head>
+<body>
+
+<div class="cover" role="img" aria-label="Ảnh bìa trang Buy Me a Coffee của Little Ken"></div>
+
+<div class="shell">
+
+  <header class="profile">
+    <div class="avatar" role="img" aria-label="Ảnh đại diện của Little Ken"></div>
+    <h1>Little Ken</h1>
+    
+    <div class="actions">
+      <a class="btn btn-ghost" href="https://buymeacoffee.com/sliboxsoft" target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+        Follow
+      </a>
+      <button class="btn btn-ghost" type="button" id="share">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+          <path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/>
+        </svg>
+        <span id="share-label">Share</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 2 cột ngang trên màn rộng, dọc trên màn hẹp -->
+  <div class="main">
+
+    <!-- ===== cột 1: khung donate ===== -->
+    <aside class="support" aria-labelledby="support-h">
+      <div class="card">
+        <div class="frame">
+          <!-- Đúng widget mà nút nổi BMC mở ra, chỉ khác là nhúng inline.
+               allow= giữ nguyên như script BMC đặt, thiếu nó thì Apple Pay
+               và passkey trong khung sẽ không chạy. -->
+          <iframe
+            src="https://buymeacoffee.com/widget/page/sliboxsoft?description=Support%20me%20on%20Buy%20me%20a%20coffee!&amp;color=%235F7FFF"
+            title="Khung ủng hộ Buy Me a Coffee của Little Ken"
+            loading="lazy"
+            allow="payment *; publickey-credentials-get *"
+            referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+        <div class="frame-note">
+          
+          
+        </div>
+      </div>
+    </aside>
+
+    <!-- ===== cột 2: description ===== -->
+    <div class="col">
+
+      <section class="card about">
+        <div class="body">
+          <p>Hey, I'm an indie developer 👋</p>
+          <p>I love building games, creating software from scratch, and making tools that help fellow developers bring their ideas to life.</p>
+          <p>I'm always experimenting with new ideas, turning random thoughts into little projects, and sharing what I build with the community.</p>
+          <p><strong>If you enjoy what I make, please buy me a coffee! ☕😄</strong></p>
+          <p>Your coffee keeps me awake, and your support keeps me going!</p>
+          <p>Every cup of coffee you buy helps fuel late-night coding sessions, sparks new ideas, and gives me more time to create better games, useful tools, and fun projects for everyone.</p>
+          <p>Whether it's a coffee, a few kind words, or simply sharing my work, every bit of support means the world to me.</p>
+          <p>Thanks for being part of this journey! ❤️</p>
+        </div>
+      </section>
+
+
+    </div>
+  </div>
+
+  <footer>
+    <div class="links">
+      <a href="../">Web Version</a>
+      <a href="https://github.com/flowbone2d/FlowBoneEditor/releases" target="_blank" rel="noopener">Download</a>
+      <a href="https://www.facebook.com/sliboxsoft" target="_blank" rel="noopener">Facebook</a>
+      <a href="https://buymeacoffee.com/sliboxsoft" target="_blank" rel="noopener">Buy Me a Coffee</a>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+/* Nút Chia sẻ: dùng share sheet của máy nếu có, không thì copy link. */
+(function(){
+  var btn = document.getElementById('share');
+  var lbl = document.getElementById('share-label');
+  if(!btn) return;
+  var url = location.href, title = document.title;
+
+  function flash(text){
+    var old = lbl.textContent;
+    lbl.textContent = text;
+    setTimeout(function(){ lbl.textContent = old; }, 1800);
+  }
+
+  btn.addEventListener('click', function(){
+    if(navigator.share){
+      navigator.share({title:title, url:url}).catch(function(){});
+      return;
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(url)
+        .then(function(){ flash('Đã copy link'); })
+        .catch(function(){ flash('Không copy được'); });
+    }else{
+      flash('Không copy được');
+    }
+  });
+})();
+</script>
+
+<!-- Nút nổi BMC: bong bóng tròn góc phải dưới, bấm vào mở đúng widget
+     như trong khung donate. data-message để trống nên không có bong bóng
+     lời chào tự bật. -->
+<script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="sliboxsoft" data-description="Support me on Buy me a coffee!" data-message="" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+
+</body>
+</html>
