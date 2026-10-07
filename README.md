@@ -59,7 +59,7 @@ chuyển đổi nào**.
 | Định dạng | Đọc | Ghi |
 |---|---|---|
 | Spine JSON | ✅ | ✅ |
-| FlowBone project (`.flowbone`) |
+| FlowBone project (`.flowbone`) |✅ | ✅ |
 
 
 ### Độ trung thực định dạng
