@@ -2,19 +2,30 @@
 <html>
 <head>
   <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
+    Everything below is named relatively — flutter_bootstrap.js,
+    manifest.json, icons/ — and this is what they are relative *to*.
 
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
+    "./" rather than "/", so one build runs from whatever folder it is
+    dropped into. The site is published under a version folder, as in
+    https://flowbone2d.github.io/V1.1.3/, and "/" sends the browser to the
+    domain root for every one of those files: the page comes up asking for
+    /manifest.json and getting a 404.
+
+    This is where Flutter's template keeps the /
+    placeholder, which `flutter build web --base-href` fills in. It is gone
+    on purpose: that flag insists on a leading and trailing slash — an
+    absolute path by definition — so it cannot say "wherever I am", which is
+    the only answer that goes on working as the version folder changes.
+
+    One catch, since the placeholder is what the flag writes over: passing
+    --base-href now does nothing at all, and says nothing about it. If a
+    build ever has to be pinned to one absolute path, put the placeholder
+    back on the line below and pass the flag.
 
     For more details:
     * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
   -->
-  <base href="/">
+  <base href="./">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
@@ -31,8 +42,148 @@
 
   <title>flowbone</title>
   <link rel="manifest" href="manifest.json">
+
+  <!--
+    What fills the window until Flutter has drawn its first frame.
+
+    That wait is not short: the engine, the fonts and the app itself are
+    megabytes, and over a slow line it is many seconds of nothing. The page
+    was plain white for all of it, which reads as a site that is broken
+    rather than one that is loading.
+
+    Plain CSS on purpose, and no images: anything fetched here would queue
+    behind the very download this is covering, so the first thing the user
+    sees would be the last thing to arrive. The colours are the app's own,
+    so the splash and what replaces it are the same surface.
+  -->
+  <style>
+    html, body {
+      /* The app's own background, painted before any of it is loaded — the
+         white flash of an unstyled page is the thing being fixed. */
+      background: #1E2126;
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    #boot {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 22px;
+      background: #1E2126;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      /* Lifted above the canvas Flutter builds underneath it. */
+      z-index: 10;
+      transition: opacity 420ms ease;
+    }
+
+    /* Set the moment the first frame is drawn; see the script below. */
+    #boot.ready {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Three dots, as the app's own mark is three overlapping circles. They
+       fill in turn, which is the whole of the animation. */
+    #boot .mark {
+      display: flex;
+      gap: 9px;
+    }
+
+    #boot .mark i {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: #FFC24B;
+      opacity: 0.25;
+      animation: boot-pulse 1.25s ease-in-out infinite;
+    }
+
+    #boot .mark i:nth-child(2) { animation-delay: 0.16s; }
+    #boot .mark i:nth-child(3) { animation-delay: 0.32s; }
+
+    @keyframes boot-pulse {
+      0%, 70%, 100% { opacity: 0.25; transform: translateY(0); }
+      35%           { opacity: 1;    transform: translateY(-5px); }
+    }
+
+    #boot .name {
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      color: #ECEFF3;
+    }
+
+    #boot .what {
+      margin-top: -14px;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.38);
+    }
+
+    /* An indeterminate bar: the loader reports no progress to read, and a
+       fake percentage would be a lie told while someone waits. */
+    #boot .bar {
+      position: relative;
+      width: 168px;
+      height: 2px;
+      border-radius: 2px;
+      background: #2B2F36;
+      overflow: hidden;
+    }
+
+    #boot .bar::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 40%;
+      border-radius: 2px;
+      background: #FFC24B;
+      animation: boot-slide 1.35s ease-in-out infinite;
+    }
+
+    @keyframes boot-slide {
+      0%   { left: -40%; }
+      100% { left: 100%; }
+    }
+
+    /* Someone who has asked for less movement gets the mark and the bar
+       standing still, rather than no sign that anything is happening. */
+    @media (prefers-reduced-motion: reduce) {
+      #boot .mark i,
+      #boot .bar::after { animation: none; }
+      #boot .mark i { opacity: 1; }
+      #boot .bar::after { left: 0; width: 100%; opacity: 0.5; }
+    }
+  </style>
 </head>
 <body>
+  <div id="boot">
+    <div class="mark"><i></i><i></i><i></i></div>
+    <div class="name">FlowBone</div>
+    <div class="what">Skeleton editor</div>
+    <div class="bar"></div>
+  </div>
+
   <script src="flutter_bootstrap.js" async></script>
+  <script>
+    // Flutter fires this on the window once it has painted, which is the
+    // first moment there is anything behind this to see. Waiting on the
+    // loader instead would uncover a canvas that is still blank.
+    window.addEventListener('flutter-first-frame', function () {
+      var boot = document.getElementById('boot');
+      if (!boot) return;
+      boot.classList.add('ready');
+      // Taken out rather than left transparent on top of the app: the
+      // transition is the only thing holding it there.
+      boot.addEventListener('transitionend', function () { boot.remove(); });
+    });
+  </script>
 </body>
 </html>
