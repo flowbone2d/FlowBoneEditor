@@ -1,0 +1,237 @@
+
+Cat Lite.png
+size: 1468,1596
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+Body-1
+  rotate: false
+  xy: 443, 513
+  size: 285, 350
+  orig: 285, 350
+  offset: 0, 0
+  index: -1
+Body-2
+  rotate: false
+  xy: 741, 513
+  size: 285, 350
+  orig: 285, 350
+  offset: 0, 0
+  index: -1
+Body-3
+  rotate: false
+  xy: 1039, 513
+  size: 285, 350
+  orig: 285, 350
+  offset: 0, 0
+  index: -1
+Body-4
+  rotate: false
+  xy: 11, 975
+  size: 285, 350
+  orig: 285, 350
+  offset: 0, 0
+  index: -1
+Hand1-a
+  rotate: false
+  xy: 672, 1483
+  size: 61, 90
+  orig: 61, 90
+  offset: 0, 0
+  index: -1
+Hand1-a 2
+  rotate: false
+  xy: 735, 1483
+  size: 61, 90
+  orig: 61, 90
+  offset: 0, 0
+  index: -1
+Hand1-a 3
+  rotate: false
+  xy: 798, 1483
+  size: 61, 90
+  orig: 61, 90
+  offset: 0, 0
+  index: -1
+Hand1-a 4
+  rotate: false
+  xy: 861, 1483
+  size: 61, 90
+  orig: 61, 90
+  offset: 0, 0
+  index: -1
+Hand1-b
+  rotate: false
+  xy: 541, 1330
+  size: 189, 146
+  orig: 189, 146
+  offset: 0, 0
+  index: -1
+Hand1-b 2
+  rotate: false
+  xy: 240, 1483
+  size: 74, 109
+  orig: 74, 109
+  offset: 0, 0
+  index: -1
+Hand1-b 3
+  rotate: false
+  xy: 1276, 1330
+  size: 67, 131
+  orig: 67, 131
+  offset: 0, 0
+  index: -1
+Hand1-b 4
+  rotate: false
+  xy: 1345, 1330
+  size: 75, 114
+  orig: 75, 114
+  offset: 0, 0
+  index: -1
+Hand2-Outline
+  rotate: false
+  xy: 73, 1483
+  size: 75, 110
+  orig: 75, 110
+  offset: 0, 0
+  index: -1
+Hand2-a
+  rotate: false
+  xy: 316, 1483
+  size: 64, 94
+  orig: 64, 94
+  offset: 0, 0
+  index: -1
+Hand2-a 2
+  rotate: false
+  xy: 382, 1483
+  size: 64, 94
+  orig: 64, 94
+  offset: 0, 0
+  index: -1
+Hand2-a 3
+  rotate: false
+  xy: 448, 1483
+  size: 64, 94
+  orig: 64, 94
+  offset: 0, 0
+  index: -1
+Hand2-a 4
+  rotate: false
+  xy: 514, 1483
+  size: 64, 94
+  orig: 64, 94
+  offset: 0, 0
+  index: -1
+Hand2-b
+  rotate: false
+  xy: 732, 1330
+  size: 148, 142
+  orig: 148, 142
+  offset: 0, 0
+  index: -1
+Hand2-b 2
+  rotate: false
+  xy: 580, 1483
+  size: 90, 91
+  orig: 90, 91
+  offset: 0, 0
+  index: -1
+Hand2-b 3
+  rotate: false
+  xy: 924, 1483
+  size: 82, 88
+  orig: 82, 88
+  offset: 0, 0
+  index: -1
+Hand2-b 4
+  rotate: false
+  xy: 150, 1483
+  size: 88, 110
+  orig: 88, 110
+  offset: 0, 0
+  index: -1
+HandOutLine
+  rotate: false
+  xy: 0, 1483
+  size: 71, 113
+  orig: 71, 113
+  offset: 0, 0
+  index: -1
+Head
+  rotate: false
+  xy: 0, 0
+  size: 517, 511
+  orig: 517, 511
+  offset: 0, 0
+  index: -1
+Head 2
+  rotate: false
+  xy: 519, 0
+  size: 425, 477
+  orig: 425, 477
+  offset: 0, 0
+  index: -1
+Head 3
+  rotate: false
+  xy: 946, 0
+  size: 432, 471
+  orig: 432, 471
+  offset: 0, 0
+  index: -1
+Head 4
+  rotate: false
+  xy: 0, 513
+  size: 430, 460
+  orig: 430, 460
+  offset: 0, 0
+  index: -1
+RifleTypeA
+  rotate: false
+  xy: 0, 1330
+  size: 539, 151
+  orig: 539, 151
+  offset: 0, 0
+  index: -1
+Sword0
+  rotate: false
+  xy: 882, 1330
+  size: 392, 138
+  orig: 392, 138
+  offset: 0, 0
+  index: -1
+Tail-1
+  rotate: false
+  xy: 505, 993
+  size: 196, 235
+  orig: 196, 238
+  offset: 0, 3
+  index: -1
+Tail-2
+  rotate: false
+  xy: 712, 993
+  size: 196, 235
+  orig: 196, 238
+  offset: 0, 3
+  index: -1
+Tail-3
+  rotate: false
+  xy: 919, 993
+  size: 196, 235
+  orig: 196, 238
+  offset: 0, 3
+  index: -1
+Tail-4
+  rotate: false
+  xy: 1126, 993
+  size: 196, 235
+  orig: 196, 238
+  offset: 0, 3
+  index: -1
+necklace
+  rotate: false
+  xy: 298, 975
+  size: 196, 255
+  orig: 196, 255
+  offset: 0, 0
+  index: -1

@@ -1,11 +1,6 @@
 # flowbone — Trình biên tập hoạt hình xương 2D kiểu Spine
 
-**flowbone** là một trình biên tập hoạt hình xương (skeletal animation).
-
-Mục đích chính của nó: đọc thư mục xuất khẩu của **Spine 3.8**, biến chúng
-thành dự án có thể chỉnh sửa, rồi ghi trở lại **đúng định dạng cũ** — để Unity
-(runtime `spine-unity`) có thể chạy kết quả ngay lập tức, **không cần bước
-chuyển đổi nào**.
+**flowbone** là một trình biên tập hoạt hình xương (skeletal animation). Có thể chạy trực tiếp trên các game engine**.
 
 
 ---
@@ -13,7 +8,7 @@ chuyển đổi nào**.
 ## 1. Tính năng chính
 
 ### Nhập (Import)
-- Trỏ vào một thư mục (ví dụ `Assets/Source_Animations`) và nó tự quét toàn bộ
+- Trỏ vào một thư mục và nó tự quét toàn bộ
   cây thư mục để tìm skeleton Spine: mọi file `*.json` hợp lệ, đi kèm
   `*.atlas.txt` và các trang `*.png`.
 - Đọc cả tỉ lệ import từ `*_SkeletonData.asset` do Unity sinh ra, để bản xem

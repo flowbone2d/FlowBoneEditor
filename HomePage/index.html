@@ -73,7 +73,13 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-off
   background-image:url("https://cdn.buymeacoffee.com/uploads/profile_pictures/2026/09/TXo9EZzDvMAmTwph.png@300w_0e.webp");
   border:4px solid var(--panel);
   box-shadow:0 2px 10px rgba(13,12,34,.12);
+  position:relative;overflow:hidden;   /* cắt hoạt ảnh theo khung tròn */
 }
+/* Chạy được hoạt ảnh thì tắt ảnh tĩnh, không thì nó lộ ra qua phần
+   trong suốt của nhân vật. */
+.avatar.is-live{background-image:none}
+.avatar-stage{position:absolute;inset:0}
+.avatar-stage .spine-player{width:100%;height:100%}
 .profile h1{
   margin:6px 0 0;font-size:clamp(1.7rem,5vw,2.25rem);
   font-weight:800;letter-spacing:-.028em;line-height:1.12;
@@ -83,7 +89,26 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-off
 .profile .meta{color:var(--dim);font-size:.86rem}
 
 /* ---- Follow / Share kiểu BMC ---- */
-.actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:14px}
+/* Follow / Share neo cố định ở góc trên bên trái màn hình, nổi trên
+   mọi thứ và theo khi cuộn. Giữ nguyên vị trí trong markup để thứ tự
+   đọc và script #share không đổi.
+   env(safe-area-inset-*) để không chui xuống tai thỏ khi xoay ngang. */
+.actions{
+  position:fixed;z-index:50;
+  top:max(14px,env(safe-area-inset-top));
+  left:max(14px,env(safe-area-inset-left));
+  display:flex;gap:8px;flex-wrap:nowrap;
+}
+/* Nút phải đọc được cả trên ảnh bìa lẫn khi cuộn xuống nền trắng,
+   nên thêm nền mờ + đổ bóng thay vì để trắng trơn. */
+.actions .btn-ghost{
+  padding:9px 15px;font-size:.88rem;
+  background:rgba(255,255,255,.92);
+  backdrop-filter:saturate(1.4) blur(8px);
+  -webkit-backdrop-filter:saturate(1.4) blur(8px);
+  box-shadow:0 2px 10px rgba(13,12,34,.16);
+}
+.actions .btn-ghost:hover{background:#fff}
 
 /* =====  BỐ CỤC CHÍNH  ==========================================
    Màn hẹp: 1 cột, khung donate lên trước.
@@ -168,6 +193,119 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-off
 }
 .cta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
 
+/* ---- khung xem thử hoạt ảnh (spine-player) ----
+   Sân khấu có nền lõm + đáy kẻ ô để thấy rõ phần trong suốt của
+   nhân vật; player tự vẽ canvas trong suốt đè lên. */
+.showcase{margin-top:22px}
+.showcase .card{padding:0;overflow:hidden}
+.showcase h2{
+  margin:0;padding:18px clamp(18px,3.2vw,22px) 0;
+  font-size:1.18rem;font-weight:700;letter-spacing:-.018em;
+}
+.showcase .sub{
+  padding:4px clamp(18px,3.2vw,22px) 14px;
+  color:var(--dim);font-size:.9rem;text-wrap:pretty;
+}
+.stage{
+  position:relative;
+  height:clamp(280px,34vw,440px);
+  border-block:1px solid var(--line);
+  background:
+    linear-gradient(0deg,rgba(95,127,255,.06),rgba(95,127,255,.06)),
+    var(--sunken);
+}
+/* lưới mờ cho ra chất "viewport" của editor */
+.stage::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:
+    linear-gradient(to right,rgba(13,12,34,.05) 1px,transparent 1px),
+    linear-gradient(to bottom,rgba(13,12,34,.05) 1px,transparent 1px);
+  background-size:28px 28px;
+}
+/* canvas của player phải nằm trên lưới */
+.stage > .spine-player{position:relative;z-index:1;width:100%;height:100%}
+
+.stage-fallback{
+  position:absolute;inset:0;z-index:2;
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;margin:0;text-align:center;text-wrap:balance;
+  color:var(--dim);font-size:.9rem;
+}
+.stage.is-live .stage-fallback{display:none}
+
+.anim-panel{
+  display:flex;flex-direction:column;gap:10px;
+  padding:14px clamp(18px,3.2vw,22px) 18px;
+}
+.chips{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.chips .chips-label{
+  flex:none;font-size:.72rem;font-weight:700;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--dim);
+}
+.chip{
+  font-family:inherit;font-size:.86rem;font-weight:600;cursor:pointer;
+  padding:7px 14px;border-radius:999px;
+  border:1px solid var(--line);background:var(--panel);color:var(--fg);
+  transition:background .12s,border-color .12s,color .12s;
+}
+.chip:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.chip[aria-pressed="true"]{
+  background:var(--accent);border-color:var(--accent);color:#fff;
+}
+.chip:disabled{opacity:.5;cursor:default}
+.chip.chip-num{min-width:38px;padding-inline:0;text-align:center}
+
+/* ---- 2 tab trong khung ủng hộ ----
+   Tab chuyển khoản chỉ hiện với khách ở VN (xem script cuối trang),
+   nên mặc định markup để hidden và JS mới bật lên. */
+[hidden]{display:none !important}
+
+.tabs{
+  display:flex;gap:6px;padding:12px;
+  background:var(--sunken);border-bottom:1px solid var(--line);
+}
+.tab{
+  flex:1;font-family:inherit;font-size:.9rem;font-weight:600;cursor:pointer;
+  padding:9px 12px;border-radius:999px;
+  border:1px solid transparent;background:transparent;color:var(--dim);
+  transition:background .12s,color .12s,border-color .12s;
+}
+.tab:hover{color:var(--fg)}
+.tab[aria-selected="true"]{
+  background:var(--panel);border-color:var(--line);color:var(--fg);
+  box-shadow:0 1px 3px rgba(13,12,34,.08);
+}
+
+/* ---- khung chuyển khoản ---- */
+.qr-pane{
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+  padding:20px clamp(18px,3.2vw,22px) 22px;
+}
+.qr-pane img{
+  /* height:auto bắt buộc: img có sẵn attribute height=1444, chỉ đặt
+     width thì ảnh bị kéo dãn dọc. */
+  width:min(100%,290px);height:auto;border-radius:12px;
+  border:1px solid var(--line);background:#fff;
+}
+.qr-hint{color:var(--dim);font-size:.88rem;text-align:center;text-wrap:pretty}
+.qr-acc{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;
+  width:100%;padding:12px 14px;
+  background:var(--sunken);border:1px solid var(--line);border-radius:12px;
+}
+.qr-acc .num{
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:1.02rem;font-weight:700;letter-spacing:.02em;
+}
+.qr-acc .who{width:100%;text-align:center;color:var(--dim);font-size:.82rem}
+.qr-copy{
+  font-family:inherit;font-size:.84rem;font-weight:600;cursor:pointer;
+  padding:7px 14px;border-radius:999px;
+  border:1px solid var(--line);background:var(--panel);color:var(--fg);
+  transition:background .12s,border-color .12s,color .12s;
+}
+.qr-copy:hover{border-color:var(--accent);color:var(--accent)}
+
 footer{
   border-top:1px solid var(--line);margin-top:34px;
   padding-block:22px 40px;color:var(--dim);font-size:.85rem;
@@ -191,7 +329,12 @@ footer p{text-align:center;text-wrap:balance;max-width:56ch;margin-inline:auto}
 <div class="shell">
 
   <header class="profile">
-    <div class="avatar" role="img" aria-label="Ảnh đại diện của Little Ken"></div>
+    <div class="avatar">
+      <!-- Ảnh tĩnh là nền của .avatar, làm fallback; chạy được
+           hoạt ảnh thì .is-live tắt nó đi. -->
+      <div class="avatar-stage" id="avatar-stage" role="img"
+           aria-label="Ảnh đại diện của Little Ken: nhân vật mèo cầm súng làm bằng FlowBone"></div>
+    </div>
     <h1>Little Ken</h1>
     
     <div class="actions">
@@ -219,6 +362,28 @@ footer p{text-align:center;text-wrap:balance;max-width:56ch;margin-inline:auto}
     <!-- ===== cột 1: khung donate ===== -->
     <aside class="support" aria-labelledby="support-h">
       <div class="card">
+
+        <!-- Chỉ khách có IP ở VN mới thấy hàng tab này; nơi khác giữ
+             nguyên một khung Buy Me a Coffee như cũ. -->
+        <div class="tabs" id="pay-tabs" role="tablist" aria-label="Cách ủng hộ" hidden>
+          <button class="tab" type="button" role="tab" id="tab-qr"
+                  aria-controls="pane-qr" aria-selected="false">QR Code</button>
+          <button class="tab" type="button" role="tab" id="tab-bmc"
+                  aria-controls="pane-bmc" aria-selected="true">Buy Me a Coffee</button>
+        </div>
+
+        <div class="qr-pane" id="pane-qr" role="tabpanel" aria-labelledby="tab-qr" hidden>
+          <img src="bank_QR.jpg" width="1241" height="1444"
+               alt="Mã QR chuyển khoản Techcombank của Phạm Trung Kiên, số tài khoản 180 181 6688">
+          <p class="qr-hint">Tiếp thêm động lực cho tác giả phát triển sản phẩm.</p>
+          <div class="qr-acc">
+            <span class="num" id="acc-num">180 181 6688</span>
+            <button class="qr-copy" type="button" id="acc-copy">Copy số TK</button>
+            <span class="who">Techcombank · PHAM TRUNG KIEN</span>
+          </div>
+        </div>
+
+        <div id="pane-bmc" role="tabpanel" aria-labelledby="tab-bmc">
         <div class="frame">
           <!-- Đúng widget mà nút nổi BMC mở ra, chỉ khác là nhúng inline.
                allow= giữ nguyên như script BMC đặt, thiếu nó thì Apple Pay
@@ -234,11 +399,13 @@ footer p{text-align:center;text-wrap:balance;max-width:56ch;margin-inline:auto}
           
           
         </div>
+        </div>
       </div>
     </aside>
 
     <!-- ===== cột 2: description ===== -->
     <div class="col">
+
 
       <section class="card about">
         <div class="body">
@@ -256,6 +423,35 @@ footer p{text-align:center;text-wrap:balance;max-width:56ch;margin-inline:auto}
 
     </div>
   </div>
+
+    <!-- Xem thử: file mẫu xuất từ FlowBone, render bằng spine-player.
+         Nút bấm nằm ngoài canvas để khớp giao diện trang. -->
+    <section class="showcase" aria-labelledby="showcase-h">
+      <div class="card">
+        <h2 id="showcase-h">Demo FlowBone Character</h2>
+        <p class="sub"></p>
+
+        <div class="stage" id="anim-stage">
+          <p class="stage-fallback" id="anim-fallback">Importing…</p>
+        </div>
+
+        <div class="anim-panel" id="anim-panel">
+          <div class="chips" role="group" aria-label="Chọn hoạt ảnh">
+            <span class="chips-label">Animations</span>
+            <button class="chip" type="button" data-anim="normal-idle" aria-pressed="true" disabled>Idle</button>
+            <button class="chip" type="button" data-anim="gun-idle" aria-pressed="false" disabled>Idle Gun</button>
+            <button class="chip" type="button" data-anim="slash" aria-pressed="false" disabled>Slash</button>
+          </div>
+          <div class="chips" role="group" aria-label="Chọn trang phục">
+            <span class="chips-label">Skins</span>
+            <button class="chip chip-num" type="button" data-skin="skin1" aria-pressed="true" aria-label="Trang phục 1" disabled>1</button>
+            <button class="chip chip-num" type="button" data-skin="skin2" aria-pressed="false" aria-label="Trang phục 2" disabled>2</button>
+            <button class="chip chip-num" type="button" data-skin="skin3" aria-pressed="false" aria-label="Trang phục 3" disabled>3</button>
+            <button class="chip chip-num" type="button" data-skin="skin4" aria-pressed="false" aria-label="Trang phục 4" disabled>4</button>
+          </div>
+        </div>
+      </div>
+    </section>
 
   <footer>
     <div class="links">
@@ -296,7 +492,115 @@ footer p{text-align:center;text-wrap:balance;max-width:56ch;margin-inline:auto}
     }
   });
 })();
+
+/* ---------------------------------------------------------------
+   Tab "Chuyển khoản" chỉ bật cho khách ở Việt Nam.
+
+   Trang chạy tĩnh trên GitHub Pages nên không đọc được IP phía
+   server; hỏi /cdn-cgi/trace của Cloudflare là cách nhẹ nhất (trả về
+   text, có CORS, không cần key, không giới hạn lượt). Gọi hỏng hoặc
+   quá 2,5s thì đoán tạm bằng múi giờ máy — thà lỡ hiện tab còn hơn
+   bắt khách VN ngồi đợi.
+
+   Không có thông tin gì chắc chắn thì giữ nguyên một khung Buy Me a
+   Coffee như trước, tức là mặc định an toàn.
+   --------------------------------------------------------------- */
+(function(){
+  var tabs = document.getElementById('pay-tabs');
+  var tabQR = document.getElementById('tab-qr');
+  var tabBMC = document.getElementById('tab-bmc');
+  var paneQR = document.getElementById('pane-qr');
+  var paneBMC = document.getElementById('pane-bmc');
+  if(!tabs || !tabQR || !tabBMC || !paneQR || !paneBMC) return;
+
+  function select(tab){
+    var qr = tab === tabQR;
+    tabQR.setAttribute('aria-selected', String(qr));
+    tabBMC.setAttribute('aria-selected', String(!qr));
+    paneQR.hidden = !qr;
+    paneBMC.hidden = qr;
+  }
+
+  tabQR.addEventListener('click', function(){ select(tabQR); });
+  tabBMC.addEventListener('click', function(){ select(tabBMC); });
+
+  /* Mũi tên trái/phải giữa 2 tab, đúng kiểu tablist quen thuộc. */
+  tabs.addEventListener('keydown', function(e){
+    if(e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    var next = document.activeElement === tabQR ? tabBMC : tabQR;
+    select(next); next.focus(); e.preventDefault();
+  });
+
+  function enable(){
+    tabs.hidden = false;
+    select(tabQR);   /* khách VN vào là thấy QR trước */
+  }
+
+  function inVietnam(){
+    try{
+      var tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+      return tz === 'Asia/Ho_Chi_Minh' || tz === 'Asia/Saigon';
+    }catch(e){ return false; }
+  }
+
+  /* Hỏi một lần mỗi phiên, khỏi gọi lại mỗi lần đổi trang. */
+  var cached = null;
+  try{ cached = sessionStorage.getItem('geo-vn'); }catch(e){}
+  if(cached === '1'){ enable(); return; }
+  if(cached === '0'){ return; }
+
+  var done = false;
+  function finish(isVN){
+    if(done) return;
+    done = true;
+    try{ sessionStorage.setItem('geo-vn', isVN ? '1' : '0'); }catch(e){}
+    if(isVN) enable();
+  }
+
+  var ctrl = window.AbortController ? new AbortController() : null;
+  var timer = setTimeout(function(){
+    if(ctrl) ctrl.abort();
+    finish(inVietnam());
+  }, 2500);
+
+  fetch('https://www.cloudflare.com/cdn-cgi/trace', ctrl ? {signal:ctrl.signal} : undefined)
+    .then(function(r){ return r.ok ? r.text() : Promise.reject(); })
+    .then(function(text){
+      clearTimeout(timer);
+      var m = /(?:^|\n)loc=([A-Z]{2})/.exec(text);
+      finish(m ? m[1] === 'VN' : inVietnam());
+    })
+    .catch(function(){
+      clearTimeout(timer);
+      finish(inVietnam());
+    });
+})();
+
+/* Copy số tài khoản, đỡ phải nhìn ảnh gõ tay. */
+(function(){
+  var btn = document.getElementById('acc-copy');
+  var num = document.getElementById('acc-num');
+  if(!btn || !num) return;
+
+  btn.addEventListener('click', function(){
+    var plain = num.textContent.replace(/\s+/g,'');
+    var old = btn.textContent;
+    function flash(text){
+      btn.textContent = text;
+      setTimeout(function(){ btn.textContent = old; }, 1800);
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(plain)
+        .then(function(){ flash('Đã copy'); })
+        .catch(function(){ flash('Không copy được'); });
+    }else{
+      flash('Không copy được');
+    }
+  });
+})();
 </script>
+
+<script src="index.js" defer></script>
 
 <!-- Nút nổi BMC: bong bóng tròn góc phải dưới, bấm vào mở đúng widget
      như trong khung donate. data-message để trống nên không có bong bóng
