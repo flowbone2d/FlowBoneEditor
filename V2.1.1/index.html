@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!--
+    Everything below is named relatively — flutter_bootstrap.js,
+    manifest.json, icons/ — and this is what they are relative *to*.
+
+    It has to be an absolute path: `flutter run` refuses to serve a page
+    whose base is "./", and `flutter build web --base-href` refuses anything
+    that does not start and end with a slash. But the site is published under
+    a version folder, as in https://flowbone2d.github.io/V1.1.3/, and the "/"
+    Flutter writes here by default sends the browser to the domain root for
+    every one of those files — the page comes up asking for /manifest.json
+    and getting a 404.
+
+    So the placeholder stays, and the script below turns whatever it was
+    filled with into the folder this page was actually served from. Both
+    tools are satisfied, one build runs from wherever it is dropped, and the
+    next version folder needs no edit anywhere.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+  -->
+  <base href="/">
+  <script>
+    // Only when nothing more specific was asked for: a build given its own
+    // --base-href meant that path and is left alone.
+    (function () {
+      var base = document.querySelector('base');
+      if (!base || base.getAttribute('href') !== '/') return;
+      // The folder this page came from: the path with the file name, if any,
+      // taken off the end. Everything loaded after this line — the manifest,
+      // the icons, the engine and the app itself — is found beside it.
+      base.setAttribute('href', location.pathname.replace(/[^/]*$/, ''));
+    })();
+  </script>
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="A new Flutter project.">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="flowbone">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>flowbone</title>
+  <link rel="manifest" href="manifest.json">
+
+  <!--
+    What fills the window until Flutter has drawn its first frame.
+
+    That wait is not short: the engine, the fonts and the app itself are
+    megabytes, and over a slow line it is many seconds of nothing. The page
+    was plain white for all of it, which reads as a site that is broken
+    rather than one that is loading.
+
+    Plain CSS on purpose, and no images: anything fetched here would queue
+    behind the very download this is covering, so the first thing the user
+    sees would be the last thing to arrive. The colours are the app's own,
+    so the splash and what replaces it are the same surface.
+  -->
+  <style>
+    html, body {
+      /* The app's own background, painted before any of it is loaded — the
+         white flash of an unstyled page is the thing being fixed. */
+      background: #1E2126;
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    #boot {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 22px;
+      background: #1E2126;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      /* Lifted above the canvas Flutter builds underneath it. */
+      z-index: 10;
+      transition: opacity 420ms ease;
+    }
+
+    /* Set the moment the first frame is drawn; see the script below. */
+    #boot.ready {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Three dots, as the app's own mark is three overlapping circles. They
+       fill in turn, which is the whole of the animation. */
+    #boot .mark {
+      display: flex;
+      gap: 9px;
+    }
+
+    #boot .mark i {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: #FFC24B;
+      opacity: 0.25;
+      animation: boot-pulse 1.25s ease-in-out infinite;
+    }
+
+    #boot .mark i:nth-child(2) { animation-delay: 0.16s; }
+    #boot .mark i:nth-child(3) { animation-delay: 0.32s; }
+
+    @keyframes boot-pulse {
+      0%, 70%, 100% { opacity: 0.25; transform: translateY(0); }
+      35%           { opacity: 1;    transform: translateY(-5px); }
+    }
+
+    #boot .name {
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      color: #ECEFF3;
+    }
+
+    #boot .what {
+      margin-top: -14px;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.38);
+    }
+
+    /* An indeterminate bar: the loader reports no progress to read, and a
+       fake percentage would be a lie told while someone waits. */
+    #boot .bar {
+      position: relative;
+      width: 168px;
+      height: 2px;
+      border-radius: 2px;
+      background: #2B2F36;
+      overflow: hidden;
+    }
+
+    #boot .bar::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 40%;
+      border-radius: 2px;
+      background: #FFC24B;
+      animation: boot-slide 1.35s ease-in-out infinite;
+    }
+
+    @keyframes boot-slide {
+      0%   { left: -40%; }
+      100% { left: 100%; }
+    }
+
+    /* Someone who has asked for less movement gets the mark and the bar
+       standing still, rather than no sign that anything is happening. */
+    @media (prefers-reduced-motion: reduce) {
+      #boot .mark i,
+      #boot .bar::after { animation: none; }
+      #boot .mark i { opacity: 1; }
+      #boot .bar::after { left: 0; width: 100%; opacity: 0.5; }
+    }
+  </style>
+</head>
+<body>
+  <div id="boot">
+    <div class="mark"><i></i><i></i><i></i></div>
+    <div class="name">FlowBone</div>
+    <div class="what">Skeleton editor</div>
+    <div class="bar"></div>
+  </div>
+
+  <script>
+    // Added here rather than written as a <script src> of its own.
+    //
+    // The browser scans ahead for things to fetch while the page is still
+    // being parsed, and it resolves what it finds against the base as it
+    // stands at that moment — which, for a tag sitting in the HTML, is
+    // before the base above has been corrected. The engine still loaded,
+    // from the right place, but a speculative fetch of /flutter_bootstrap.js
+    // went to the domain root first and came back 404. Built here, there is
+    // no src for the scanner to find and nothing to go looking for twice.
+    (function () {
+      var s = document.createElement('script');
+      s.src = 'flutter_bootstrap.js';
+      s.async = true;
+      document.body.appendChild(s);
+    })();
+  </script>
+  <script>
+    // Flutter fires this on the window once it has painted, which is the
+    // first moment there is anything behind this to see. Waiting on the
+    // loader instead would uncover a canvas that is still blank.
+    window.addEventListener('flutter-first-frame', function () {
+      var boot = document.getElementById('boot');
+      if (!boot) return;
+      boot.classList.add('ready');
+      // Taken out rather than left transparent on top of the app: the
+      // transition is the only thing holding it there.
+      boot.addEventListener('transitionend', function () { boot.remove(); });
+    });
+  </script>
+</body>
+</html>
