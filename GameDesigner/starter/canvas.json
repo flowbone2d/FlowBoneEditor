@@ -1,0 +1,8 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "title": "Main", "page": "page-1", "x": 0, "y": 0, "w": 960, "h": 540 }
+  ],
+  "annotations": [],
+  "launch": { "view": "canvas", "page": "page-1" },
+  "pages": [ { "id": "page-1", "name": "Page 1" } ]
+}
