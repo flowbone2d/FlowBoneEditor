@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GameDesigner · Hướng dẫn</title>
+<meta name="description" content="Cách import và sử dụng GameDesigner: canvas xem artboard, Play và Export cho art game.">
+<link rel="icon" type="image/png" href="../V2.1.1/favicon.png">
+<style>
+  :root{
+    --bg:#0f1115; --panel:#171a21; --line:#2a2f3a; --text:#e6e8ee; --dim:#a4abba;
+    --accent:#7f9cff; --warn:#f0b35a; --code:#12151b;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;scroll-padding-top:16px}
+  body{margin:0;background:var(--bg);color:var(--text);
+       font:400 16px/1.65 system-ui,-apple-system,"Segoe UI",sans-serif}
+  a{color:var(--accent)}
+  .wrap{max-width:1040px;margin:0 auto;padding:48px 24px 80px;
+        display:grid;grid-template-columns:190px minmax(0,1fr);gap:48px}
+  nav{position:sticky;top:24px;align-self:start;font-size:14px}
+  nav strong{display:block;margin-bottom:8px;color:var(--dim);font-weight:600}
+  nav a{display:block;padding:4px 0;color:var(--text);text-decoration:none}
+  nav a:hover{color:var(--accent)}
+  h1{margin:0 0 8px;font-size:40px;line-height:1.15}
+  h2{margin:56px 0 12px;font-size:25px;line-height:1.25}
+  h3{margin:28px 0 8px;font-size:18px}
+  p{margin:0 0 14px}
+  ul,ol{margin:0 0 14px;padding-left:22px}
+  li{margin-bottom:6px}
+  .lead{font-size:18px;color:var(--dim)}
+  code{font:13.5px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+       background:var(--code);border:1px solid var(--line);border-radius:5px;padding:1px 5px;
+       overflow-wrap:anywhere}
+  .code{position:relative;margin:0 0 18px}
+  pre{margin:0;padding:16px;overflow-x:auto;background:var(--code);
+      border:1px solid var(--line);border-radius:8px}
+  pre code{background:none;border:0;padding:0;overflow-wrap:normal}
+  .copy{position:absolute;top:8px;right:8px;min-height:32px;padding:4px 10px;font:inherit;font-size:13px;
+        color:var(--text);background:var(--panel);border:1px solid var(--line);
+        border-radius:6px;cursor:pointer}
+  .copy:hover{border-color:var(--accent)}
+  .table{overflow-x:auto;margin:0 0 18px}
+  table{width:100%;min-width:560px;border-collapse:collapse;font-size:15px}
+  th,td{padding:10px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+  th{color:var(--dim);font-weight:600}
+  .note{margin:0 0 18px;padding:14px 16px;background:var(--panel);
+        border:1px solid var(--line);border-radius:8px}
+  .note.warn{border-color:var(--warn)}
+  .note strong:first-child{color:var(--warn)}
+  .note p:last-child{margin-bottom:0}
+  @media (max-width:800px){
+    .wrap{display:block;padding:32px 16px 64px}
+    nav{position:static;margin-bottom:32px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+    h1{font-size:32px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav aria-label="Mục lục">
+  <strong>GameDesigner</strong>
+  <a href="#chon-cach">Chọn cách import</a>
+  <a href="#python">Đóng gói bằng Python</a>
+  <a href="#snippet">Load từ GitHub Pages</a>
+  <a href="#artifact">Claude Artifact</a>
+  <a href="#thu-muc">Thư mục art</a>
+  <a href="#artboard">Viết artboard</a>
+  <a href="#su-dung">Dùng canvas</a>
+  <a href="#gioi-han">Giới hạn</a>
+  <a href="#loi">Lỗi thường gặp</a>
+</nav>
+
+<main>
+<h1>GameDesigner</h1>
+<p class="lead">Một canvas có sẵn để trình bày art game: xếp nhiều artboard, zoom, chạy thử và xuất PNG, PDF, HTML. Bạn chỉ cần chuẩn bị art, phần tính năng không phải làm lại.</p>
+<p>Tải về: <a href="canvas-shell.html" download>canvas-shell.html</a> (2,4 MB, phần editor) · <a href="build_canvas.py" download>build_canvas.py</a> (công cụ đóng gói) · <a href="starter/canvas.json" download>starter/canvas.json</a> · <a href="starter/Main.dc.html" download>starter/Main.dc.html</a></p>
+
+<div class="note warn">
+  <p><strong>Lưu ý:</strong> mở thẳng <code>canvas-shell.html</code> chỉ thấy trang trống vì nó chưa có art. Hãy gắn art vào bằng một trong các cách dưới đây.</p>
+</div>
+
+<h2 id="chon-cach">Chọn cách import</h2>
+<div class="table">
+<table>
+  <thead><tr><th>Cách</th><th>Kết quả</th><th>Nên dùng khi</th></tr></thead>
+  <tbody>
+    <tr><td><a href="#python">Đóng gói bằng Python</a></td><td>Một file HTML chứa cả editor và art</td><td>Cần gửi file, xem offline hoặc lưu lại một phiên bản</td></tr>
+    <tr><td><a href="#snippet">Load từ GitHub Pages</a></td><td>Trang nhỏ, editor tải từ Pages khi mở</td><td>Art nằm trên website của bạn và hay thay đổi</td></tr>
+    <tr><td><a href="#artifact">Claude Artifact</a></td><td>Không import được, dùng Design type thay thế</td><td>Làm art ngay trên claude.ai</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="python">Cách 1: Đóng gói bằng Python</h2>
+<p>Cần Python 3, không phải cài thêm thư viện.</p>
+<ol>
+  <li>Tải editor và công cụ đóng gói vào cùng một thư mục:
+<div class="code"><pre><code>curl -O https://flowbone2d.github.io/FlowBoneEditor/GameDesigner/canvas-shell.html
+curl -O https://flowbone2d.github.io/FlowBoneEditor/GameDesigner/build_canvas.py</code></pre></div></li>
+  <li>Tạo thư mục art từ mẫu:
+<div class="code"><pre><code>mkdir my-art
+curl -o my-art/canvas.json https://flowbone2d.github.io/FlowBoneEditor/GameDesigner/starter/canvas.json
+curl -o my-art/Main.dc.html https://flowbone2d.github.io/FlowBoneEditor/GameDesigner/starter/Main.dc.html</code></pre></div></li>
+  <li>Đóng gói:
+<div class="code"><pre><code>python3 build_canvas.py my-art my-art.html --title "My Art"</code></pre></div></li>
+  <li>Mở <code>my-art.html</code> trong trình duyệt. Mỗi lần sửa art thì chạy lại lệnh ở bước 3.</li>
+</ol>
+
+<h2 id="snippet">Cách 2: Load từ GitHub Pages</h2>
+<p>Lưu đoạn dưới thành một file HTML, đặt cạnh thư mục <code>art/</code> trên website của bạn. Khi mở, trang tải editor từ GitHub Pages rồi gắn art vào.</p>
+<div class="code"><pre><code>&lt;!doctype html&gt;
+&lt;meta charset="utf-8"&gt;
+&lt;title&gt;Đang tải...&lt;/title&gt;
+&lt;script&gt;
+const SHELL = 'https://flowbone2d.github.io/FlowBoneEditor/GameDesigner/canvas-shell.html';
+const TITLE = 'My Art';
+const BASE  = 'art/';
+// Liệt kê đủ mọi file trong thư mục art, kể cả ảnh.
+const FILES = ['canvas.json', 'Main.dc.html'];
+
+const isText = n =&gt; /\.(html|json|css|js|svg|md|txt)$/i.test(n);
+const toBase64 = buf =&gt; {
+  let s = '';
+  new Uint8Array(buf).forEach(b =&gt; s += String.fromCharCode(b));
+  return btoa(s);
+};
+const read = async n =&gt; {
+  const r = await fetch(BASE + n);
+  if (!r.ok) throw new Error('Thiếu file: ' + n);
+  return isText(n) ? r.text() : toBase64(await r.arrayBuffer());
+};
+(async () =&gt; {
+  const [shell, ...data] = await Promise.all([
+    fetch(SHELL).then(r =&gt; r.text()),
+    ...FILES.map(read),
+  ]);
+  const files = Object.fromEntries(FILES.map((n, i) =&gt; [n, data[i]]));
+  const doc = JSON.stringify({ title: TITLE, content: { files }, comments: [] })
+    .replaceAll('&lt;', '\\u003c');
+  const tag = 'id="appifact-doc"&gt;';
+  const start = shell.indexOf(tag) + tag.length;
+  const end = shell.indexOf('&lt;/scr' + 'ipt&gt;', start);
+  document.open();
+  document.write(shell.slice(0, start) + doc + shell.slice(end));
+  document.close();
+  document.title = TITLE;
+})();
+&lt;/script&gt;</code></pre></div>
+<p>Trang này phải chạy qua <code>http://</code> hoặc <code>https://</code>. Mở bằng <code>file://</code> sẽ không tải được art. Để thử trên máy:</p>
+<div class="code"><pre><code>python3 -m http.server 8000</code></pre></div>
+
+<h2 id="artifact">Claude Artifact</h2>
+<p>Artifact trên claude.ai chỉ tải script từ một số CDN cho phép, nên không import được editor từ GitHub Pages. Thay vào đó, hãy nhờ Claude tạo canvas từ <strong>Design type</strong>: canvas đó đã có editor riêng và còn lưu được chỉnh sửa.</p>
+<p>Design type dùng định dạng <code>canvas.json</code> mới và cách upload ảnh khác, nên thư mục art ở đây không chép thẳng sang được.</p>
+
+<h2 id="thu-muc">Thư mục art</h2>
+<p>Mọi file nằm ngay trong thư mục art. Công cụ đóng gói không đọc thư mục con.</p>
+<div class="code"><pre><code>my-art/
+  canvas.json       bố cục canvas
+  Main.dc.html      một artboard
+  Shop.dc.html      artboard khác
+  coin.png          ảnh dùng trong artboard</code></pre></div>
+
+<h3>canvas.json</h3>
+<div class="code"><pre><code>{
+  "artboards": [
+    { "file": "Main.dc.html", "title": "Main", "page": "page-1",
+      "x": 0, "y": 0, "w": 960, "h": 540, "is_interactive": true },
+    { "file": "Shop.dc.html", "title": "Shop", "page": "page-1",
+      "x": 1060, "y": 0, "w": 960, "h": 540 }
+  ],
+  "annotations": [
+    { "id": "note-1", "page": "page-1", "x": 0, "y": -150, "w": 400, "text": "Ghi chú" }
+  ],
+  "launch": { "view": "canvas", "page": "page-1" },
+  "pages": [ { "id": "page-1", "name": "Page 1" } ]
+}</code></pre></div>
+<div class="table">
+<table>
+  <thead><tr><th>Trường</th><th>Ý nghĩa</th></tr></thead>
+  <tbody>
+    <tr><td><code>artboards</code></td><td>Danh sách artboard. <code>x</code>, <code>y</code> là vị trí trên canvas, <code>w</code>, <code>h</code> là kích thước khung.</td></tr>
+    <tr><td><code>is_interactive</code></td><td>Đánh dấu artboard có nút hoặc link hoạt động.</td></tr>
+    <tr><td><code>annotations</code></td><td>Ghi chú dán trên canvas. Để <code>[]</code> nếu không dùng.</td></tr>
+    <tr><td><code>pages</code></td><td>Các trang của canvas. Mỗi artboard thuộc một trang qua <code>page</code>.</td></tr>
+    <tr><td><code>launch</code></td><td>Trang hiện ra khi mở. Luôn khai báo trường này.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="artboard">Viết artboard</h2>
+<p>Mỗi artboard là một file <code>.dc.html</code>. Giữ nguyên dòng <code>support.js</code>, phần tử gốc có kích thước đúng bằng <code>w</code> và <code>h</code> trong <code>canvas.json</code>.</p>
+<div class="code"><pre><code>&lt;!doctype html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;script src="./support.js"&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;x-dc&gt;
+&lt;helmet&gt;
+  &lt;style&gt;
+body{margin:0;overflow:hidden}
+  &lt;/style&gt;
+&lt;/helmet&gt;
+&lt;div style="width: 960px; height: 540px; background: #1c1207; color: #f6e8ca"&gt;
+  &lt;h1&gt;Shop&lt;/h1&gt;
+  &lt;img src="coin.png" style="width: 96px"&gt;
+  &lt;a href="Main.dc.html"&gt;Quay lại&lt;/a&gt;
+&lt;/div&gt;
+&lt;/x-dc&gt;
+&lt;script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":960,"height":540}}'&gt;
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre></div>
+<ul>
+  <li><strong>Ảnh:</strong> ghi đúng tên file, ví dụ <code>src="coin.png"</code>, và đặt ảnh trong thư mục art.</li>
+  <li><strong>Chuyển màn hình:</strong> dùng <code>&lt;a href="Shop.dc.html"&gt;</code>. Link hoạt động trong chế độ Play.</li>
+  <li><strong>Kích thước:</strong> <code>$preview</code> phải khớp <code>w</code> và <code>h</code> của artboard.</li>
+</ul>
+
+<h2 id="su-dung">Dùng canvas</h2>
+<div class="table">
+<table>
+  <thead><tr><th>Nút</th><th>Việc làm được</th></tr></thead>
+  <tbody>
+    <tr><td>Pages</td><td>Chuyển giữa các trang của canvas.</td></tr>
+    <tr><td>Zoom</td><td>Phóng to, thu nhỏ canvas.</td></tr>
+    <tr><td>Play (trên artboard)</td><td>Mở artboard toàn màn hình. Bấm Back to canvas để quay lại.</td></tr>
+    <tr><td>Export (trên artboard)</td><td>Xuất PNG 1×, PNG 2×, PDF, HTML (.zip), hoặc gộp mọi artboard thành một PDF.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="gioi-han">Giới hạn</h2>
+<ul>
+  <li><strong>Chỉ xem, không lưu:</strong> ngoài claude.ai, canvas ở chế độ Read-only. Muốn đổi nội dung thì sửa file art rồi đóng gói hoặc tải lại trang.</li>
+  <li><strong>Cách 2 cần mạng:</strong> nếu GitHub Pages không truy cập được thì trang không mở được. Dùng cách 1 khi cần chạy offline.</li>
+  <li><strong>Phiên bản:</strong> cách 2 luôn dùng file editor mới nhất trên Pages. Cách 1 giữ nguyên bản đã đóng gói.</li>
+</ul>
+
+<h2 id="loi">Lỗi thường gặp</h2>
+<div class="table">
+<table>
+  <thead><tr><th>Hiện tượng</th><th>Cách xử lý</th></tr></thead>
+  <tbody>
+    <tr><td>Trang trống</td><td>Bạn đang mở <code>canvas-shell.html</code> chưa có art. Đóng gói hoặc dùng snippet.</td></tr>
+    <tr><td>Artboard rất nhỏ ở góc màn hình</td><td>Thêm <code>launch</code> vào <code>canvas.json</code>.</td></tr>
+    <tr><td>Artboard có thanh cuộn</td><td>Thêm <code>overflow:hidden</code> vào <code>body</code> trong <code>&lt;helmet&gt;</code>.</td></tr>
+    <tr><td>Ảnh không hiện</td><td>Kiểm tra ảnh nằm ngay trong thư mục art và tên trùng khớp cả chữ hoa, chữ thường. Với cách 2, thêm tên ảnh vào <code>FILES</code>.</td></tr>
+    <tr><td>Cách 2 dừng ở "Đang tải..."</td><td>Mở Console của trình duyệt. <code>Thiếu file</code> nghĩa là tên trong <code>FILES</code> sai. Nếu đang mở bằng <code>file://</code>, hãy chạy qua web server.</td></tr>
+  </tbody>
+</table>
+</div>
+</main>
+</div>
+<script>
+  document.querySelectorAll('.code').forEach(box => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'copy';
+    btn.textContent = 'Sao chép';
+    btn.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(box.querySelector('code').textContent);
+      btn.textContent = 'Đã chép';
+      setTimeout(() => btn.textContent = 'Sao chép', 1500);
+    });
+    box.appendChild(btn);
+  });
+</script>
+</body>
+</html>
